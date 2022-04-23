@@ -13,7 +13,6 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-import corsheaders.middleware
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -54,9 +53,10 @@ INSTALLED_APPS = [
 ]
 # cors组建的配置信息
 CORS_ORIGIN_WHITELIST = (
-    # 在部分corsheaders模块中，如果不带http协议会导致无法跨域’http://www.linyin.cn:8080‘
-    'www.linyin.cn:8080'
+    # 在部分的cors_headrs模块中，如果不带协议，会导致客户端无法跨域，就需要配置 "http://www.luffycity.cn:8080"
+    'http://www.linyin.cn:8080',
 )
+
 #不允许ajax携带cookie
 CORS_ALLOW_CREDENTIALS = False
 
