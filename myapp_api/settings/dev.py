@@ -13,9 +13,14 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+import corsheaders.middleware
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+# 把apps目录下面所有的子应用设置为可以导包，那就需要把apps设置为默认导包路径
+import sys
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+import home
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -25,7 +30,10 @@ SECRET_KEY = 'django-insecure-k=&8eza*8wqtbyu)@7+nlk_n0r@ht1@#r+($joetrgbu57fu*s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'api.linyin.cn',
+    'www.linyin.cn',
+]
 
 
 # Application definition
@@ -37,9 +45,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'corsheaders',
+    'rest_framework',
+    # 子应用
+    'home',
+
 ]
+# cors组建的配置信息
+CORS_ORIGIN_WHITELIST = (
+    # 在部分corsheaders模块中，如果不带http协议会导致无法跨域’http://www.linyin.cn:8080‘
+    'www.linyin.cn:8080'
+)
+#不允许ajax携带cookie
+CORS_ALLOW_CREDENTIALS = False
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,8 +98,12 @@ WSGI_APPLICATION = 'myapp_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '127.0.0.1',
+        'PORT': 3306,
+        'USER': 'luffy_user',
+        'PASSWORD': '123',
+        'NAME': 'luffy',
     }
 }
 
@@ -105,8 +131,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+# 修改使用中文界面
+# LANGUAGE_CODE = 'zh-Hans'
 
-TIME_ZONE = 'UTC'
+# 修改时区
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -119,6 +148,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
+# 项目中存储上传文件的根目录[暂时配置]，注意，uploads目录需要手动创建否则上传文件时报错
+MEDIA_ROOT=os.path.join(BASE_DIR, "uploads")
+# 访问上传文件的url地址前缀
+MEDIA_URL ="/media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

@@ -6,6 +6,7 @@ import router from './router'
 import settings from './settings';
 
 Vue.config.productionTip = false;
+//把对象挂载vue中
 Vue.prototype.$settings = settings;
 
 // element-ui配置
