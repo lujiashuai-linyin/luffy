@@ -38,6 +38,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'simpleui',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,10 +48,14 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'rest_framework',
+
     # 子应用
     'home',
 
 ]
+# 离线模式simpleui
+SIMPLEUI_STATIC_OFFLINE = True
+
 # cors组建的配置信息
 CORS_ORIGIN_WHITELIST = (
     # 在部分的cors_headrs模块中，如果不带协议，会导致客户端无法跨域，就需要配置 "http://www.luffycity.cn:8080"
@@ -130,9 +135,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# LANGUAGE_CODE = 'en-us'
 # 修改使用中文界面
-# LANGUAGE_CODE = 'zh-Hans'
+LANGUAGE_CODE = 'zh-Hans'
 
 # 修改时区
 TIME_ZONE = 'Asia/Shanghai'
@@ -146,6 +151,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
+# 静态文件根目录目录
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 STATIC_URL = '/static/'
 
