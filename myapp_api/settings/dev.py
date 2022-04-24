@@ -53,8 +53,8 @@ INSTALLED_APPS = [
     'home',
 
 ]
-# 离线模式simpleui
-SIMPLEUI_STATIC_OFFLINE = True
+# # 离线模式simpleui
+# SIMPLEUI_STATIC_OFFLINE = True
 
 # cors组建的配置信息
 CORS_ORIGIN_WHITELIST = (
