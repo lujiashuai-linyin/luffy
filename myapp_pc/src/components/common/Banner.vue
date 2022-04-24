@@ -7,27 +7,27 @@
 </template>
 
 <script>
-    export default {
-        name: "Banner",
-        data(){
-          return{
-            banner_list: []
-          }
-        },
-        created () {
-          this.get_banner_list();
-        },
-        methods: {
-          get_banner_list(){
-            this.$axios.get(`${this.$settings.HOST}/banner/`,{}).then(response=>{
-            console.log(response.data);
-            this.banner_list = response.data
-            }).catch(error=>{
-              console.log(error.response)
-            });
-          }
-      }
+export default {
+  name: 'Banner',
+  data () {
+    return {
+      banner_list: []
     }
+  },
+  created () {
+    this.get_banner_list()
+  },
+  methods: {
+    get_banner_list () {
+      this.$axios.get(`${this.$settings.HOST}/banner/`, {}).then(response => {
+        console.log(response.data)
+        this.banner_list = response.data
+      }).catch(error => {
+        console.log(error.response)
+      })
+    }
+  }
+}
 </script>
 
 <style scoped>
