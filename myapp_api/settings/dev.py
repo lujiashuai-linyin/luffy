@@ -46,13 +46,22 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'mdeditor',
     'corsheaders',
     'rest_framework',
+    'django_filters',
 
     # 子应用
     'home',
+    'user',
+    'course',
+    'cart',
 
 ]
+#针对django3.0+修改 frame 配置，
+X_FRAME_OPTIONS = 'SAMEORIGIN'  # django 3.0 + 默认为 deny
+
+
 # # 离线模式simpleui
 # SIMPLEUI_STATIC_OFFLINE = True
 
@@ -112,6 +121,57 @@ DATABASES = {
     }
 }
 
+# 设置redis缓存
+CACHES = {
+    # 默认缓存
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        # 项目上线时,需要调整这里的路径
+        "LOCATION": "redis://127.0.0.1:6379/0",
+
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            'CONNECTION_POLL_KWARGS': {
+                'max_connections': 1000,
+                'encoding': 'utf-8'
+            },
+            'PASSWORD': 'xianjian1998'
+        },
+
+    },
+    # 提供给xadmin或者admin的session存储
+    # "session": {
+    #     "BACKEND": "django_redis.cache.RedisCache",
+    #     "LOCATION": "redis://127.0.0.1:6379/1",
+    #     "OPTIONS": {
+    #         "CLIENT_CLASS": "django_redis.client.DefaultClient",
+    #     }
+    # },
+    # 提供存储短信验证码
+    "sms_code": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            'CONNECTION_POLL_KWARGS': {
+                'max_connections': 1000,
+                'encoding': 'utf-8'
+            },
+            'PASSWORD': 'xianjian1998'
+        }
+    },
+    # 提供存储购物车商品信息
+    "cart": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/3",
+        "OPTIONS": {
+            'max_connections': 1000,
+            'encoding': 'utf-8',
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        'PASSWORD': 'xianjian1998'
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -146,7 +206,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -203,7 +263,7 @@ LOGGING = {
             # 日志位置,日志文件名,日志保存目录logs必须手动创建
             'filename': os.path.join(os.path.dirname(BASE_DIR), "logs/luffy.log"),
             # 日志文件的最大值,这里我们设置300M
-            'maxBytes': 1024,
+            'maxBytes': 300 * 1024 * 1024,
             # 日志文件的数量,设置最大日志数量为10
             'backupCount': 10,
             # 日志格式:详细格式
@@ -222,4 +282,74 @@ LOGGING = {
 REST_FRAMEWORK = {
     # 异常处理
     'EXCEPTION_HANDLER': 'myapp_api.utils.exceptions.custom_exception_handler',
+    # 登录认证
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+import datetime
+JWT_AUTH = {
+    # 设置jwt有效期
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    # 设置返回数据的格式
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'user.utils.jwt_response_payload_handler',
+}
+
+# 实现多条件登录判断--挂件重构
+AUTHENTICATION_BACKENDS = [
+    'user.utils.UsernameMobileAuthBackend',
+]
+
+# 注册自定义模型
+AUTH_USER_MODEL = 'user.User'
+
+# 腾讯短信与对象存储
+#腾讯云短信应用app_id
+TENCENT_SMS_APP_ID = 1400632003
+#腾讯云短信的app_key
+TENCENT_SMS_APP_KEY = "178c45c93e06ca4ce2bbf70b7b617a8e"
+#腾讯云短信签名内容
+TENCENT_SMS_SIGN = "林音三弦个人公众号"
+
+#腾讯云短信模板ID
+TENCENT_SMS_TEMPLATE = {
+    "login": 1300422,
+    "register": 1300423,
+    "re_pwd": 1300420
+}
+
+#腾讯cos的id和key
+COS_SECRET_ID = 'AKIDaz81e05tPecJkvpTqwqTqypQknZ4IH1U'   # 替换为用户的 secretId
+COS_SECRET_KEY = 'DApDKAk36sNaMrHTP5UcU6RVIq77rQkn'
+
+MDEDITOR_CONFIGS = {
+    'default':{
+        'width': '90%',  # 自定义编辑框宽度
+        'heigth': 500,   # 自定义编辑框高度
+        'toolbar': ["undo", "redo", "|",
+                    "bold", "del", "italic", "quote", "ucwords", "uppercase", "lowercase", "|",
+                    "h1", "h2", "h3", "h5", "h6", "|",
+                    "list-ul", "list-ol", "hr", "|",
+                    "link", "reference-link", "image", "code", "preformatted-text", "code-block", "table", "datetime",
+                    "emoji", "html-entities", "pagebreak", "goto-line", "|",
+                    "help", "info",
+                    "||", "preview", "watch", "fullscreen"],  # 自定义编辑框工具栏
+        'upload_image_formats': ["jpg", "jpeg", "gif", "png", "bmp", "webp"],  # 图片上传格式类型
+        'image_folder': 'editor',  # 图片保存文件夹名称
+        'theme': 'default',  # 编辑框主题 ，dark / default
+        'preview_theme': 'default',  # 预览区域主题， dark / default
+        'editor_theme': 'default',  # edit区域主题，pastel-on-dark / default
+        'toolbar_autofixed': True,  # 工具栏是否吸顶
+        'search_replace': True,  # 是否开启查找替换
+        'emoji': True,  # 是否开启表情功能
+        'tex': True,  # 是否开启 tex 图表功能
+        'flow_chart': True,  # 是否开启流程图功能
+        'sequence': True,  # 是否开启序列图功能
+        'watch': True,  # 实时预览
+        'lineWrapping': False,  # 自动换行
+        'lineNumbers': False  # 行号
+    }
 }

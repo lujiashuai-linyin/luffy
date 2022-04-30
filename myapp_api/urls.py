@@ -22,7 +22,12 @@ from django.views.static import serve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    re_path(r'mdeditor/', include('mdeditor.urls')),
     re_path(r'media/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT}),
     re_path(r'^', include('home.urls')),
+    path('user/', include('user.urls')),
+    path('course/', include('course.urls')),
+    path('cart/', include('cart.urls')),
+
 
 ]
