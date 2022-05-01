@@ -27,6 +27,7 @@ Vue.prototype.$axios = axios; // 把对象挂载vue中
 import '../static/js/gt.js'
 
 // vue-video-player 视频播放器
+
 require('video.js/dist/video-js.css');
 require('vue-video-player/src/custom-theme.css');
 import VideoPlayer from 'vue-video-player'

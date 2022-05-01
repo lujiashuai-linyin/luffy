@@ -1,7 +1,7 @@
 from django.urls import path,re_path
 from . import views
 urlpatterns = [
-    path(r"", views.CartAPIView.as_view(
+    path("", views.CartAPIView.as_view(
         {
             "post":"add",
             "get":"list",
@@ -9,5 +9,5 @@ urlpatterns = [
             "put":"change_expire",
             "delete":"del_cart",
         }) ),
-    path(r"order/",views.CartAPIView.as_view({"get":"get_selected_course"}))
+    path("order/", views.CartAPIView.as_view({"get": "get_selected_course"}))
 ]

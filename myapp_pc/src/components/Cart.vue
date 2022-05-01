@@ -45,7 +45,6 @@ export default {
       }
     },
     created(){
-      console.log('sss')
       this.token = this.check_user_login();
       this.get_cart();
     },

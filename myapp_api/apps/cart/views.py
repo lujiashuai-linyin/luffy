@@ -3,12 +3,11 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.viewsets import ViewSet
 from rest_framework.permissions import IsAuthenticated
-from course.models import CourseExpire, CourseExpire
+from course.models import CourseExpire, CourseExpire, Course
 from rest_framework.response import Response
 from rest_framework import status
 from django_redis import get_redis_connection
 import logging
-
 from myapp_api.settings import constants
 
 log = logging.getLogger("django")
@@ -21,12 +20,13 @@ class CartAPIView(ViewSet):
         # 接受客户端提交参数[用户ID，课程ID，勾选状态，有效期选项]
         course_id = request.data.get("course_id")
         user_id = request.user.id
+        print(user_id)
         # 设置默认值
         selected = True
         expire = 0
         # 校验参数
         try:
-            course = CourseExpire.objects.get(is_show=True, is_deleted=False, id=course_id)
+            course = Course.objects.get(is_show=True, is_deleted=False, id=course_id)
         except CourseExpire.DoesNotExist:
             return Response({"message":"参数有误！课程不存在！"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -57,15 +57,15 @@ class CartAPIView(ViewSet):
         user_id = request.user.id
         # 从redis中读取数据
         redis_conn = get_redis_connection("cart")
-        cart_bytes_dict = redis_conn.hgetall("cart_%s" % user_id )
-        selected_bytes_list = redis_conn.smembers("selected_%s" % user_id )
+        cart_bytes_dict = redis_conn.hgetall("cart_%s" % user_id)
+        selected_bytes_list = redis_conn.smembers("selected_%s" % user_id)
         # 使用循环从mysql中根据课程ID提取对应的商品信息[商品ID，商品封面图片，商品标题]
         data = []
-        for course_id_bytes,expire_id_bytes in cart_bytes_dict.items():
+        for course_id_bytes, expire_id_bytes in cart_bytes_dict.items():
             course_id = int(course_id_bytes.decode())
             expire_id = int(expire_id_bytes.decode())
             try:
-                course = CourseExpire.objects.get(is_show=True, is_deleted=False, pk=course_id)
+                course = Course.objects.get(is_show=True, is_deleted=False, pk=course_id)
             except CourseExpire.DoesNotExist:
                 continue
 
@@ -86,7 +86,7 @@ class CartAPIView(ViewSet):
         selected = request.data.get("selected")
         course_id = request.data.get("course_id")
         try:
-            CourseExpire.objects.get(is_show=True, is_deleted=False, id=course_id)
+            Course.objects.get(is_show=True, is_deleted=False, id=course_id)
         except CourseExpire.DoesNotExist:
             return Response({"message":"参数有误！当前商品课程不存在！"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -105,7 +105,7 @@ class CartAPIView(ViewSet):
         course_id = request.data.get("course_id")
         try:
             # 判断课程是否存在
-            course = CourseExpire.objects.get(is_show=True, is_deleted=False, id=course_id)
+            course = Course.objects.get(is_show=True, is_deleted=False, id=course_id)
             # 判断课程的有效期选项是0还是其他的数值，如果是其他数值，还要判断是否存在于有效期选项表中
             if expire_id > 0:
                 epxire_item = CourseExpire.objects.filter(is_show=True,is_deleted=False,id=expire_id)
@@ -128,7 +128,7 @@ class CartAPIView(ViewSet):
         user_id = request.user.id
         course_id = request.query_params.get("course_id")
         try:
-            CourseExpire.objects.get(is_show=True, is_deleted=False, id=course_id)
+            Course.objects.get(is_show=True, is_deleted=False, id=course_id)
         except CourseExpire.DoesNotExist:
             return Response({"message":"参数有误！当前商品课程不存在！"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -145,6 +145,7 @@ class CartAPIView(ViewSet):
         """获取购物车中勾选的商品列表"""
         # 获取用户ID
         user_id = request.user.id
+        print('order_list', user_id)
         # 获取redis连接
         redis_conn = get_redis_connection("cart")
 
@@ -156,12 +157,12 @@ class CartAPIView(ViewSet):
         data = [] # 商品列表
         total_price = 0 # 勾选商品总价格
         for course_id_bytes,expire_id_bytes in cart_bytes_dict.items():
-            course_id = int( course_id_bytes.decode() )
-            expire_id = int( expire_id_bytes.decode() )
+            course_id = int(course_id_bytes.decode())
+            expire_id = int(expire_id_bytes.decode())
             # 判断商品课程ID是否在勾选集合中
             if course_id_bytes in selected_bytes_list:
                 try:
-                    course = CourseExpire.objects.get(is_show=True, is_deleted=False, pk=course_id)
+                    course = Course.objects.get(is_show=True, is_deleted=False, pk=course_id)
                 except CourseExpire.DoesNotExist:
                     continue
 
@@ -188,7 +189,7 @@ class CartAPIView(ViewSet):
                     "original_price": "%.2f" % original_price
                 })
 
-                total_price += float( real_price )
+                total_price += float(real_price)
 
-        return Response({"course_list":data,"total_price":total_price})
+        return Response({"course_list": data, "total_price": total_price})
 

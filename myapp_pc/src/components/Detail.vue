@@ -56,7 +56,7 @@
               <p class="chapter-length">共{{chapter_list.length}}章 {{course.lessons}}个课时</p>
             </div>
             <div class="chapter-item" v-for="chapter in chapter_list">
-              <p class="chapter-title"><img src="/static/image/1.svg" alt="">第{{chapter.chapter}}章·{{chapter.name}}</p>
+              <p class="chapter-title"><img src="static/image/1.svg" alt="">第{{chapter.chapter}}章·{{chapter.name}}</p>
               <ul class="lesson-list">
                 <li class="lesson-item" v-for="lesson in chapter.coursesections">
                   <p class="name"><span class="index">{{chapter.chapter}}-{{lesson.lesson}}</span> {{lesson.name}}<span class="free" v-if="lesson.free_trail">免费</span></p>
@@ -146,8 +146,9 @@ export default {
   methods: {
     get_course_id(){
       let course_id = this.$route.params.id;
+      console.log(course_id)
       if(course_id > 0){
-        this.course_id = parseInt( course_id );
+        this.course_id = parseInt(course_id);
       }else{
         let self = this;
         this.$alert("对不起，访问页面参数有误！","错误",{
@@ -176,7 +177,7 @@ export default {
           },1000)
         }
       }).catch(error=>{
-        this.$messge.error(error.response.data);
+        this.$message.error(error.response.data);
       })
     },
     get_course_chapter(){
@@ -189,7 +190,7 @@ export default {
         this.chapter_list = response.data;
 
       }).catch(error=>{
-        this.$messge.error(error.response.data);
+        this.$message.error(error.response.data);
       })
     },
     check_user_login(){

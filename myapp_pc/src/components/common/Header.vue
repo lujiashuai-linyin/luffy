@@ -1,52 +1,52 @@
 <template>
-  <div class="header-box">
-    <div class="header">
-      <div class="content">
-        <div class="logo full-left">
-          <router-link to="/"><img src="/static/image/logo.svg" alt=""></router-link>
-        </div>
-        <ul class="nav full-left">
-          <li v-for="nav in nav_list">
-            <span v-if="nav.is_site"><a :href="nav.link">{{nav.title}}</a></span>
-            <span v-else><router-link :to="nav.link">{{nav.title}}</router-link></span>
-          </li>
-        </ul>
+    <div class="header-box">
+      <div class="header">
+        <div class="content">
+          <div class="logo full-left">
+            <router-link to="/"><img src="/static/image/logo.svg" alt=""></router-link>
+          </div>
+          <ul class="nav full-left">
+              <li v-for="nav in nav_list">
+                <span v-if="nav.is_site"><a :href="nav.link">{{nav.title}}</a></span>
+                <span v-else><router-link :to="nav.link">{{nav.title}}</router-link></span>
+              </li>
+          </ul>
 
-        <div v-if="token" class="login-bar full-right">
-          <div class="shop-cart full-left">
-            <span class="shop-cart-total">0</span>
-            <img src="/static/image/cart.svg" alt="">
-            <span><router-link to="/cart">购物车</router-link></span>
+          <div v-if="token" class="login-bar full-right">
+            <div class="shop-cart full-left">
+              <span class="shop-cart-total">{{$store.state.cart_length}}</span>
+              <img src="/static/image/cart.svg" alt="">
+              <span><router-link to="/cart">购物车</router-link></span>
+            </div>
+            <div class="login-box login-box1 full-left">
+              <router-link to="/courses">学习中心</router-link>
+              <el-menu width="200" class="member el-menu-demo" mode="horizontal">
+                  <el-submenu index="2">
+                    <template slot="title"><img src="/static/image/logo@2x.png" alt=""></template>
+                    <el-menu-item index="2-1">我的账户</el-menu-item>
+                    <el-menu-item index="2-2">我的订单</el-menu-item>
+                    <el-menu-item index="2-3">我的优惠卷</el-menu-item>
+                    <el-menu-item index="2-3"><span @click="logoutHander">退出登录</span></el-menu-item>
+                  </el-submenu>
+                </el-menu>
+            </div>
           </div>
-          <div class="login-box login-box1 full-left">
-            <router-link to="/courses">学习中心</router-link>
-            <el-menu width="200" class="member el-menu-demo" mode="horizontal">
-              <el-submenu index="2">
-                <template slot="title"><img src="/static/image/logo@2x.png" alt=""></template>
-                <el-menu-item index="2-1">我的账户</el-menu-item>
-                <el-menu-item index="2-2">我的订单</el-menu-item>
-                <el-menu-item index="2-3">我的优惠卷</el-menu-item>
-                <el-menu-item index="2-3"><span @click="logoutHander">退出登录</span></el-menu-item>
-              </el-submenu>
-            </el-menu>
-          </div>
-        </div>
 
-        <div v-else class="login-bar full-right">
-          <div class="shop-cart full-left">
-            <img src="/static/image/cart.svg" alt="">
-            <span><router-link to="/cart">购物车</router-link></span>
+          <div v-else class="login-bar full-right">
+            <div class="shop-cart full-left">
+              <img src="/static/image/cart.svg" alt="">
+              <span><router-link to="/cart">购物车</router-link></span>
+            </div>
+            <div class="login-box full-left">
+              <router-link to="/user/login">登录</router-link>
+              &nbsp;|&nbsp;
+              <router-link to="/user/reg">立即注册</router-link>
+            </div>
           </div>
-          <div class="login-box full-left">
-            <router-link to="/user/login">登录</router-link>
-            &nbsp;|&nbsp;
-            <router-link to="/user/register">立即注册</router-link>
-          </div>
-        </div>
 
+        </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -54,39 +54,37 @@
       name: "Header",
       data(){
         return{
-          token: '',
-          nav_list: []
+            token:"",
+            nav_list: [],
         }
       },
       created() {
-        this.get_nav();
-        this.check_user_login();
-      },
-      methods: {
-
-        check_user_login(){
-          //获取用户的登录状态
-          this.token = sessionStorage.user_token || localStorage.user_token
-          return this.token
-        },
-
-        get_nav(){
-          this.$axios.get(`${this.$settings.HOST}/nav/header/`, {}).then(response=>{
-            this.nav_list = response.data
-          }).catch(error=>{
-            console.log(error.response);
-          })
-        },
-        logoutHander(){
-          // 退出登录
-          localStorage.removeItem("user_token");
-          localStorage.removeItem("user_id");
-          localStorage.removeItem("user_name");
-          sessionStorage.removeItem("user_token");
-          sessionStorage.removeItem("user_id");
-          sessionStorage.removeItem("user_name");
           this.check_user_login();
-        }
+          this.get_nav();
+      },
+      methods:{
+          check_user_login(){
+            // 获取用户的登录状态
+            this.token = sessionStorage.user_token || localStorage.user_token;
+            return this.token;
+          },
+          get_nav(){
+              this.$axios.get(`${this.$settings.HOST}/nav/header/`,{}).then(response=>{
+                  this.nav_list = response.data;
+              }).catch(error=>{
+                  console.log(error.response);
+              })
+          },
+          logoutHander(){
+              // 退出登录
+              localStorage.removeItem("user_token");
+              localStorage.removeItem("user_id");
+              localStorage.removeItem("user_name");
+              sessionStorage.removeItem("user_token");
+              sessionStorage.removeItem("user_id");
+              sessionStorage.removeItem("user_name");
+              this.check_user_login();
+          }
       }
     }
 </script>
@@ -149,14 +147,14 @@
   height: 80px;
 }
 .header .login-bar .shop-cart{
-  margin-right: 20px;
+  margin-right: 16px;
   border-radius: 17px;
   background: #f7f7f7;
   cursor: pointer;
   font-size: 14px;
   height: 28px;
-  width: 120px;
-  margin-top: 32px;
+  width: 110px;
+  margin-top: 30px;
   line-height: 32px;
   text-align: center;
 }
@@ -166,13 +164,12 @@
 .header .login-bar .shop-cart img{
   width: 15px;
   margin-right: 4px;
-  margin-left: 6px;
 }
 .header .login-bar .shop-cart span{
   margin-right: 6px;
 }
 .header .login-bar .login-box{
-  margin-top: 36px;
+  margin-top: 32px;
 }
 .header .login-bar .login-box span{
   color: #4a4a4a;
@@ -182,9 +179,9 @@
   color: #000000;
 }
 .member{
-  display: inline-block;
-  height: 34px;
-  margin-left: 20px;
+    display: inline-block;
+    height: 34px;
+    margin-left: 20px;
 }
 .member img{
   width: 26px;

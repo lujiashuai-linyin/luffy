@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'user',
     'course',
     'cart',
+    'orders',
+    'coupon',
 
 ]
 #针对django3.0+修改 frame 配置，

@@ -46,7 +46,7 @@ export default {
                     "Authorization": "jwt " + token,
                 }
             }).then(response=>{
-                this.$message.success(response.data.message);
+                // this.$message.success(response.data.message);
                 this.course.price = response.data.real_price;
                 // 当子组件中，切换了商品课程的有效期选项，则通知父组件重新计算购物商品总价
                 this.$emit("change_select");
