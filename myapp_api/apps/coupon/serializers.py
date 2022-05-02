@@ -10,4 +10,4 @@ class UserCouponModelSerializer(serializers.ModelSerializer):
     coupon = CouponModelSerializer()
     class Meta:
         model = UserCoupon
-        fields = ("id","start_time","coupon")
+        fields = ("id","start_time","coupon", "end_time")

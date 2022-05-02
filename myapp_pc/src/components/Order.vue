@@ -200,7 +200,7 @@
       },
       payHander(){
           // 生成订单
-          this.$axios.post(`${this.$settings.HOST}/order/`,{
+          this.$axios.post(`${this.$settings.HOST}/orders/`,{
               pay_type: this.pay_type,  // 支付方式
               credit: this.credit,      // 积分
               coupon: this.coupon,      // 优惠券ID

@@ -220,11 +220,13 @@ export default {
           "Authorization": "jwt " + token,
         }
       }).then(response=>{
+        console.log("okkkkk")
         this.$message.success(response.data.message);
         // 更新vuex中购物车商品总数
         this.$store.commit("add_cart", response.data.cart_length);
       }).catch(error=>{
-        this.$message.error(error.response.data.message);
+        //todo token签名过期异常还未处理
+        this.$message.error(error.response.data);
       })
     },
     onPlayerPlay(event){

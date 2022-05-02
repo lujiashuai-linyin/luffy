@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 
 # Create your models here.
@@ -41,3 +43,11 @@ class UserCoupon(BaseModel):
 
     def __str__(self):
         return "优惠券:%s,用户:%s" % (self.coupon.name, self.user.username)
+
+    @property
+    def end_time(self):
+        """获取优惠券的过期时间"""
+        start_timestamp = self.start_time.timestamp()
+        use_time = self.coupon.timer * 24 * 60 * 60
+        end_timestamp = start_timestamp + use_time
+        return datetime.fromtimestamp(end_timestamp).strftime('%Y-%m-%d %H:%M:%S')
