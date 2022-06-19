@@ -4,7 +4,8 @@ from django_redis import get_redis_connection
 from datetime import datetime
 from course.models import Course,CourseExpire
 from django.db import transaction
-
+from coupon.models import UserCoupon
+from myapp_api.settings import constants
 
 class OrderModelSerializer(serializers.ModelSerializer):
     """订单序列化器"""
@@ -28,11 +29,27 @@ class OrderModelSerializer(serializers.ModelSerializer):
         except:
             raise serializers.ValidationError("对不起，当前不支持选中的支付方式！")
 
-        # todo 判断积分使用是否上限
+        # 判断积分使用是否上限
+        user_credit = self.context["request"].user.credit
+        credit = attrs.get("credit",0)
+        if credit != 0  and user_credit < credit:
+            raise serializers.ValidationError("对不起，当前使用积分超过上限！")
 
-        # todo 判断优惠券是否满足使用条件，是否存在，或者是否已经过期
+        # 判断优惠券是否在使用期间，是否是未使用状态
+        user_coupon_id = attrs.get("coupon")
+        if user_coupon_id > 0:
+            now = datetime.now()
+            now_time = now.strftime("%Y-%m-%d %H:%M:%S")
+            try:
+                user_coupon = UserCoupon.objects.get(pk=user_coupon_id,start_time__lte=now_time,is_show=True,is_deleted=False, is_use=False)
+            except:
+                raise serializers.ValidationError("对不起，当前优惠券不可用或者不存在！")
 
-        # todo 校验购买的商品课程是否存在
+            timer_timestamp = user_coupon.coupon.timer * 24 * 60 *60
+            start_timestamp = user_coupon.start_time.timestamp()
+            end_timestamp = start_timestamp + timer_timestamp
+            if end_timestamp < now.timestamp():
+                raise serializers.ValidationError("对不起，当前优惠券不可用或者不存在！")
 
         # 一定要 return 验证结果
         return attrs
@@ -109,14 +126,49 @@ class OrderModelSerializer(serializers.ModelSerializer):
                         raise serializers.ValidationError("对不起，订单生成失败！")
 
                     # 计算订单总价
-                    order.total_price += float(original_price)
-                    order.real_price += float(real_price)
+                    order.total_price += float(real_price)
 
                     # 移除掉已经加入到订单里面的购物车商品
                     pipe.hdel("cart_%s" % user_id, course_id)
                     pipe.srem("selected_%s" % user_id, course_id)
 
+            # 默认最终实付价格是订单总价
+            real_price = order.total_price
+
             try:
+                # 对总价格加入优惠券折扣
+                user_coupon_id = validated_data.get("coupon")
+                if user_coupon_id > 0:
+                    user_coupon = UserCoupon.objects.get(pk=user_coupon_id)
+                    if user_coupon.coupon.condition > order.total_price:
+                        """如果订单总金额比使用条件价格低，则报错！"""
+                        transaction.savepoint_rollback(save_id)
+                        raise serializers.ValidationError("对不起，订单生成失败！当前购物车中购买商品总价格没达到使用该优惠券的价格条件")
+
+                    sale_num = float( user_coupon.coupon.sale[1:] )
+                    if user_coupon.coupon.sale[0] == "*":
+                        """折扣优惠"""
+                        real_price = order.total_price * sale_num
+                    else:
+                        """减免优惠"""
+                        real_price = order.total_price - sale_num
+                        if real_price < 0:
+                            real_price = 0
+
+                    order.coupon = user_coupon_id
+
+                # 对总价格加入积分抵扣
+                credit = validated_data.get("credit")
+                if credit > 0:
+                    # 判断积分是否超过订单总价格的折扣比例
+                    if credit > real_price * constants.CREDIT_MONEY:
+                        transaction.savepoint_rollback(save_id)
+                        raise serializers.ValidationError("对不起，订单生成失败！当前订单中使用的积分超过使用上限！")
+
+                    real_price = float("%.2f" % (real_price - credit / constants.CREDIT_MONEY))
+                    order.credit = credit
+
+                order.real_price = real_price
                 order.save()
                 pipe.execute()
             except:

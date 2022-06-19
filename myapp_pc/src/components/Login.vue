@@ -51,39 +51,48 @@ export default {
   },
 
   methods:{
-    loginhandler() {
-      this.$axios.post(`${this.$settings.HOST}/user/login/`, {
-        username: this.username,
-        password: this.password
-      }).then(response=>{
-        if(this.remember){
-          // 记住登录状态
-          sessionStorage.removeItem("user_token");
-          sessionStorage.removeItem("user_id");
-          sessionStorage.removeItem("user_name");
-          localStorage.user_token = response.data.token;
-          localStorage.user_id = response.data.id;
-          localStorage.user_name = response.data.username;
-        }else{
-          // 不记住登录状态
-          localStorage.removeItem("user_token");
-          localStorage.removeItem("user_id");
-          localStorage.removeItem("user_name");
-          sessionStorage.user_token = response.data.token;
-          sessionStorage.user_id = response.data.id;
-          sessionStorage.user_name = response.data.username;
-
-        }
-        // 页面跳转
-        let self = this;
-        this.$alert("登录成功!","智子纪元",{
-          callback(){
-            self.$router.push("/");
-          }
+    loginhandler(){
+        // 用户密码账号登录
+        this.$axios.post(`${this.$settings.HOST}/user/login/`,{
+            username:this.username,
+            password:this.password,
+        }).then(response=>{
+            if(this.remember){
+                // 记住登录状态
+                sessionStorage.removeItem("user_token");
+                sessionStorage.removeItem("user_id");
+                sessionStorage.removeItem("user_name");
+                sessionStorage.removeItem("user_credit");
+                sessionStorage.removeItem("credit_to_money");
+                localStorage.user_token = response.data.token;
+                localStorage.user_id = response.data.id;
+                localStorage.user_name = response.data.username;
+                localStorage.user_credit = response.data.user_credit;
+                localStorage.credit_to_money = response.data.credit_to_money;
+            }else{
+                // 不记住登录状态
+                localStorage.removeItem("user_token");
+                localStorage.removeItem("user_id");
+                localStorage.removeItem("user_name");
+                localStorage.removeItem("user_credit");
+                localStorage.removeItem("credit_to_money");
+                sessionStorage.user_token = response.data.token;
+                sessionStorage.user_id = response.data.id;
+                sessionStorage.user_name = response.data.username;
+                sessionStorage.user_credit = response.data.user_credit;
+                sessionStorage.credit_to_money = response.data.credit_to_money;
+            }
+            // 页面跳转
+            let self = this;
+            this.$alert("登录成功!","路飞学城",{
+               callback(){
+                    self.$router.push("/");
+                   // self.$router.go(-1);
+               }
+            });
+        }).catch(error=>{
+            this.$message.error("对不起，登录失败！请确认密码或账号是否正确！");
         });
-      }).catch(error=>{
-        this.$message.error("对不起，登录失败！请确认密码或账号是否正确！");
-      })
     },
     get_geetest_captcha(){
       // 获取验证码

@@ -11,5 +11,7 @@ export default {
 </script>
 
 <style>
-
+.el-icon-minus,.el-icon-plus{
+ 	font-size: 12px;
+}
 </style>

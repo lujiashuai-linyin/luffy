@@ -1,3 +1,6 @@
+from myapp_api.settings import constants
+
+
 def jwt_response_payload_handler(token, user=None, request=None):
     """
     自定义jwt认证成功返回数据
@@ -6,9 +9,11 @@ def jwt_response_payload_handler(token, user=None, request=None):
     :param request 本次客户端的请求对象
     """
     return {
-        'token': token,
-        'id': user.id,
-        'username': user.username
+        "token": token,
+        "user_id": user.id,
+        "user_credit": user.credit,
+        "credit_to_money": constants.CREDIT_MONEY,
+        "user_name": user.username
     }
 
 
