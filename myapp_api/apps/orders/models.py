@@ -49,7 +49,7 @@ class OrderDetail(BaseModel):
     expire = models.IntegerField(default='-1', verbose_name="有效期周期")
     price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="课程原价")
     real_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="课程实价")
-    discount_name = models.CharField(max_length=120,default="",verbose_name="优惠类型")
+    discount_name = models.CharField(max_length=120,default="",verbose_name="优惠类型", blank=True, null=True)
     class Meta:
         db_table ="ly_order_detail"
         verbose_name = "订单详情"

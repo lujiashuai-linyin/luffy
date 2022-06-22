@@ -137,7 +137,7 @@ CACHES = {
                 'max_connections': 1000,
                 'encoding': 'utf-8'
             },
-            'PASSWORD': 'xianjian1998'
+            # 'PASSWORD': 'xianjian1998'
         },
 
     },
@@ -159,7 +159,7 @@ CACHES = {
                 'max_connections': 1000,
                 'encoding': 'utf-8'
             },
-            'PASSWORD': 'xianjian1998'
+            # 'PASSWORD': 'xianjian1998'
         }
     },
     # 提供存储购物车商品信息
@@ -171,7 +171,7 @@ CACHES = {
             'encoding': 'utf-8',
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
-        'PASSWORD': 'xianjian1998'
+        # 'PASSWORD': 'xianjian1998'
     },
 }
 

@@ -7,8 +7,8 @@
           </div>
           <ul class="nav full-left">
               <li v-for="nav in nav_list">
-                <span v-if="nav.is_site"><a :href="nav.link">{{nav.title}}</a></span>
-                <span v-else><router-link :to="nav.link">{{nav.title}}</router-link></span>
+                <div v-if="nav.is_site"><a :href="nav.link">{{nav.title}}</a></div>
+                <div v-else><router-link :to="nav.link">{{nav.title}}</router-link></div>
               </li>
           </ul>
 
@@ -50,43 +50,44 @@
 </template>
 
 <script>
-    export default {
-      name: "Header",
-      data(){
-        return{
-            token:"",
-            nav_list: [],
-        }
-      },
-      created() {
-          this.check_user_login();
-          this.get_nav();
-      },
-      methods:{
-          check_user_login(){
-            // 获取用户的登录状态
-            this.token = sessionStorage.user_token || localStorage.user_token;
-            return this.token;
-          },
-          get_nav(){
-              this.$axios.get(`${this.$settings.HOST}/nav/header/`,{}).then(response=>{
-                  this.nav_list = response.data;
-              }).catch(error=>{
-                  console.log(error.response);
-              })
-          },
-          logoutHander(){
-              // 退出登录
-              localStorage.removeItem("user_token");
-              localStorage.removeItem("user_id");
-              localStorage.removeItem("user_name");
-              sessionStorage.removeItem("user_token");
-              sessionStorage.removeItem("user_id");
-              sessionStorage.removeItem("user_name");
-              this.check_user_login();
-          }
-      }
+export default {
+  name: 'Header',
+  data () {
+    return {
+      token: '',
+      nav_list: []
     }
+  },
+  created () {
+    this.check_user_login()
+    this.get_nav()
+    console.log(this.nav_list)
+  },
+  methods: {
+    check_user_login () {
+      // 获取用户的登录状态
+      this.token = sessionStorage.user_token || localStorage.user_token
+      return this.token
+    },
+    get_nav () {
+      this.$axios.get(`${this.$settings.HOST}/nav/header/`, {}).then(response => {
+        this.nav_list = response.data
+      }).catch(error => {
+        console.log(error.response)
+      })
+    },
+    logoutHander () {
+      // 退出登录
+      localStorage.removeItem('user_token')
+      localStorage.removeItem('user_id')
+      localStorage.removeItem('user_name')
+      sessionStorage.removeItem('user_token')
+      sessionStorage.removeItem('user_id')
+      sessionStorage.removeItem('user_name')
+      this.check_user_login()
+    }
+  }
+}
 </script>
 
 <style scoped>

@@ -32,7 +32,7 @@ class OrderModelSerializer(serializers.ModelSerializer):
         # 判断积分使用是否上限
         user_credit = self.context["request"].user.credit
         credit = attrs.get("credit",0)
-        if credit != 0  and user_credit < credit:
+        if credit != 0 and user_credit < credit:
             raise serializers.ValidationError("对不起，当前使用积分超过上限！")
 
         # 判断优惠券是否在使用期间，是否是未使用状态

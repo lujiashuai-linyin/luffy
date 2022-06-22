@@ -8,6 +8,7 @@ import Detail from "../components/Detail";
 import Cart from "../components/Cart";
 import Order from '../components/Order'
 import AliPlayer from '../components/AliPlayer'
+import Position from "../components/Position";
 
 Vue.use(Router);
 export default new Router({
@@ -56,6 +57,11 @@ export default new Router({
       path: '/aliPlayer',
       name: 'AliPlayer',
       component: AliPlayer,
+    },
+    {
+      path: '/position',
+      name: 'Position',
+      component: Position,
     }
   ]
 })
